@@ -10,6 +10,8 @@ using std::vector;
 using std::fill;
 using std::string;
 
+
+// Stand in for the three possible values a field can contain. 0 = nothing, 1 = X, 2 = O
 enum Field {
     Empty,
     Cross,
@@ -17,6 +19,7 @@ enum Field {
 };
 
 
+// This class contains the size of the play area and a 2D vector containing the fields of the play area.
 struct Game {
 
     int gameSize;
@@ -24,6 +27,7 @@ struct Game {
     vector<vector<Field>> area;
 
 
+    // Constructor: Initialises size and creates the play area such that all fields are empty.
     explicit Game(const int n) {
         gameSize = n;
 
@@ -34,6 +38,7 @@ struct Game {
 
     }
 
+    // Returns a representation of the play area state for printing to console.
     string toString() {
         string outStr;
         outStr += "  ";
@@ -46,15 +51,15 @@ struct Game {
             outStr += " " + std::to_string(k) + "|";
             for (Field field: row) {
                 switch (field) {
-                    case 0:
+                    case Empty:
                         outStr += " |";
                         break;
 
-                    case 1 :
+                    case Cross :
                         outStr += "X|";
                         break;
 
-                    case 2 :
+                    case Circle :
                         outStr += "O|";
                         break;
 
@@ -68,11 +73,12 @@ struct Game {
     }
 };
 
+// Returns true if any row contains marks of only one type.
 bool completedRow(Game & game) {
     for (auto row: game.area) {
         bool flag = true;
         for (Field field: row) {
-            if (field != 1) {
+            if (field != Cross) {
                 flag = false;
             }
         }
@@ -83,7 +89,7 @@ bool completedRow(Game & game) {
     for (auto row: game.area) {
         bool flag = true;
         for (Field field: row) {
-            if (field != 2) {
+            if (field != Circle) {
                 flag = false;
             }
         }
@@ -94,6 +100,7 @@ bool completedRow(Game & game) {
     return false;
 }
 
+// Returns true if any column contains marks of only one type.
 bool completedColumn(Game & game) {
     int n = game.gameSize;
     for (int i = 0; i < n; i++) {
@@ -102,7 +109,7 @@ bool completedColumn(Game & game) {
 
         for (int j = 0; j < n; j++) {
 
-            if (game.area[j][i] != 1 ) {
+            if (game.area[j][i] != Cross ) {
                 flag = false;
             }
 
@@ -113,7 +120,7 @@ bool completedColumn(Game & game) {
         flag = false;
         for (int j = 0; j < n; j++) {
 
-            if (game.area[j][i] != 2 ) {
+            if (game.area[j][i] != Circle ) {
                 flag = false;
             }
 
@@ -126,11 +133,12 @@ bool completedColumn(Game & game) {
     return false;
 }
 
+// Returns true if any one of the two diagonals contains marks of only one type. Ugly AF!
 bool completedDiagonal(Game & game) {
     int n = game.gameSize;
     bool flag = true;
     for (int i = 0; i < n; i++) {
-        if (game.area[i][i] != 1) {
+        if (game.area[i][i] != Cross) {
             flag = false;
         }
     }
@@ -139,7 +147,7 @@ bool completedDiagonal(Game & game) {
     }
     flag = true;
     for (int i = 0; i < n; i++) {
-        if (game.area[i][i] != 2) {
+        if (game.area[i][i] != Circle) {
             flag = false;
         }
     }
@@ -148,7 +156,7 @@ bool completedDiagonal(Game & game) {
     }
     flag = true;
     for (int i = 0; i < n; i++) {
-        if (game.area[n - 1 - i][n - 1 - i] != 1) {
+        if (game.area[n - 1 - i][n - 1 - i] != Cross) {
             flag = false;
         }
     }
@@ -157,7 +165,7 @@ bool completedDiagonal(Game & game) {
     }
     flag = true;
     for (int i = 0; i < n; i++) {
-        if (game.area[n - 1 - i][n - 1 - i] != 2) {
+        if (game.area[n - 1 - i][n - 1 - i] != Circle) {
             flag = false;
         }
     }
@@ -167,11 +175,12 @@ bool completedDiagonal(Game & game) {
     return false;
 }
 
+// Returns true if all fields have been marked.
 bool areaFull(Game & game) {
     bool flag = true;
     for (int i = 0; i < game.gameSize; i++) {
         for (int j = 0; j <game.gameSize; j++) {
-            if (game.area[i][j] == 0) {
+            if (game.area[i][j] == Empty) {
                 flag = false;
             }
         }
@@ -184,6 +193,7 @@ bool areaFull(Game & game) {
 
 }
 
+// Checks if game is finished.
 bool gameNotFinished(Game & game) {
     if (completedRow(game) || completedColumn(game) || completedDiagonal(game) || areaFull(game)) {
         return false;
@@ -192,20 +202,29 @@ bool gameNotFinished(Game & game) {
     }
 }
 
+// Runs the game.
 int main() {
 
     int gameSize;
 
+    // User specifies size of play area:
     cout << "Enter play-area size n:" << endl;
     cin >> gameSize;
 
+    // Game instance is created with specified size.
     Game game(gameSize);
 
     int count = 0;
 
+    // Runs as long as the game is not over.
     while (gameNotFinished(game) ) {
+
         int x,y;
+
+        // Print game to console.
         cout << game.toString() << endl;
+
+        // Players take turns´marking fields.
         if (count % 2 == 0) {
             cout << "Player 1: Enter field coords:" << endl;
         } else {
@@ -215,6 +234,7 @@ int main() {
         cin >> x;
         cout << "Y:";
         cin >> y;
+        // Check if coordinates are valid.
         if ( x < 0 || x > gameSize || y < 0 || y > gameSize ) {
             cout << "Error: Invalid coords!" << endl;
             continue;
@@ -222,6 +242,7 @@ int main() {
         x--;
         y--;
 
+        // Mark field while checking if it is already marked.
         if (count % 2 == 0) {
             if (game.area[y][x] == Empty) {
                 game.area[y][x] = Cross;
@@ -241,6 +262,7 @@ int main() {
 
         count++;
     }
+    // Print final game state.
     cout << "Game finished!\n";
     cout << game.toString();
 

@@ -117,7 +117,7 @@ bool completedColumn(Game & game) {
         if (flag) {
             return true;
         }
-        flag = false;
+        flag = true;
         for (int j = 0; j < n; j++) {
 
             if (game.area[j][i] != Circle ) {

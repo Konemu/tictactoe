@@ -215,7 +215,7 @@ int main() {
         cin >> x;
         cout << "Y:";
         cin >> y;
-        if ( x < 0 || x > gameSize - 1 || y < 0 || y > gameSize - 1 ) {
+        if ( x < 0 || x > gameSize || y < 0 || y > gameSize ) {
             cout << "Error: Invalid coords!" << endl;
             continue;
         }
